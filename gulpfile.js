@@ -4,6 +4,7 @@
 var gulp  =require('gulp'),
 uglify =require('gulp-uglify'),
 rename = require('gulp-rename'),
+sass        = require('gulp-sass'),
 browserSync = require('browser-sync'),
 reload = browserSync.reload;
 
@@ -16,11 +17,14 @@ gulp.task('scripts',function(){
 	.pipe(gulp.dest('App/js'));
 })
 
-///scripts task
-gulp.task('css',function(){
-	///console.log('it worked dude!');
-	gulp.src(['App/css/**/*.css','!App/css/**/*.min.css'])
-})
+// Compile sass into CSS & auto-inject into browsers
+gulp.task('sass', function() {
+    return gulp.src("app/scss/*.scss")
+        .pipe(sass())
+        .pipe(gulp.dest("app/css"))
+        .pipe(browserSync.stream());
+});
+
 
 gulp.task('html',function(){
 	gulp.src('App/**/*.html');
@@ -31,8 +35,8 @@ gulp.task('html',function(){
 ///		Watch task
 gulp.task('watch',function(){
 	gulp.watch('App/js/**/*.js',['scripts']);
-	gulp.watch('App/**/*.html',['html']);
-	gulp.watch('App/**/*.css',['css']);
+	gulp.watch('App/**/*.html',['html']).on('change', browserSync.reload);
+	gulp.watch("app/scss/*.scss", ['sass']);
 })
 
 
@@ -43,4 +47,4 @@ gulp.task('browser-sync', function(){
 })
 
 /// default task
-gulp.task('default',['scripts','watch','browser-sync']); 
+gulp.task('default',['scripts','watch','browser-sync','sass']); 
